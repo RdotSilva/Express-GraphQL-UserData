@@ -1,12 +1,6 @@
 const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
-const _ = require("lodash");
-
-// Hard coded users
-const users = [
-	{ id: "23", firstName: "Bill", age: 20 },
-	{ id: "47", firstName: "Samantha", age: 21 }
-];
+const axios = require("axios");
 
 const UserType = new GraphQLObjectType({
 	name: "User",
@@ -28,7 +22,13 @@ const RootQuery = new GraphQLObjectType({
 			args: { id: { type: GraphQLString } },
 			// Resolve reaches out and grabs the data.
 			resolve(parentValue, args) {
-				return _.find(users, { id: args.id });
+				// Wait for promise to resolve (after it hits API) for data and return it as a response.
+				return (
+					axios
+						.get(`http://localhost:3000/users/${args.id}`)
+						// .then(res => console.log(res));  {data : { firstName: 'bill' }}
+						.then(res => res.data)
+				);
 			}
 		}
 	}
